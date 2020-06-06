@@ -1,2 +1,5 @@
 ---
-# defaults file for jnvilo.docker
+# defaults
+#
+vars:
+  docker_users=[]

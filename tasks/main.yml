@@ -1,4 +1,5 @@
 ---
+   
 - name: Install yum utils
   yum:
     name: yum-utils
@@ -8,10 +9,23 @@
   yum:
     name: epel-release
     state: latest
+  when:  ansible_distribution  == "CentOS"
+
+  #- name: Instal epel-release from internet
+  #yum:
+    #  name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
+    #state: present
+    #when: ansible_distribution == "Amazon" 
+  
 
 - name: Install pip3
   yum:
     name: python3-pip
+    state: present
+
+- name: Install git
+  yum:
+    name: git
     state: present
 
 - name: Install python36-docker
@@ -115,3 +129,13 @@
   pip:
     name: docker
     executable: /usr/bin/pip3
+
+
+- name: Add users to docker
+  user:
+    name: "{{ item }}"
+    groups: docker
+    append: yes
+  with_items: 
+    "{{ docker_users }}" 
+ 
