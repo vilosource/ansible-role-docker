@@ -1,5 +1,7 @@
 ---
 # defaults
 #
-vars:
-  docker_users=[]
+docker_package: docker-ce
+docker_compose_path: /bin/docker-compose
+docker_compose_version: 1.25.4
+docker_users: 

@@ -1,141 +1,16 @@
 ---
-   
-- name: Install yum utils
-  yum:
-    name: yum-utils
-    state: latest
+- debug:
+    msg: "OS Version - {{ ansible_distribution}}"
 
-- name: Install epel-release
-  yum:
-    name: epel-release
-    state: latest
-  when:  ansible_distribution  == "CentOS"
-
-  #- name: Instal epel-release from internet
-  #yum:
-    #  name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-7.noarch.rpm
-    #state: present
-    #when: ansible_distribution == "Amazon" 
-  
-
-- name: Install pip3
-  yum:
-    name: python3-pip
-    state: present
-
-- name: Install git
-  yum:
-    name: git
-    state: present
-
-- name: Install python36-docker
-  yum:
-    name: python36-docker
-    state: present
-
-- name: Install python-docker-py
-  yum:
-    name: python-docker-py
-    state: present
+- name: Install docker
+  include: "{{ item }}"
+  with_first_found:
+    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
+    - "{{ ansible_distribution }}.yml"
+  tags: vars
 
 
-- name: Install device-mapper-persistent-data
-  yum:
-    name: device-mapper-persistent-data
-    state: latest
-
-- name: Install lvm2
-  yum:
-    name: lvm2
-    state: latest
-
-- name: Install python-setuptools
-  yum:
-    name: python-setuptools
-    state: latest
-
-- name: Add Docker repo
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docer-ce.repo
-  become: yes
-
-- name: Enable Docker Edge repo
-  ini_file:
-    dest: /etc/yum.repos.d/docer-ce.repo
-    section: 'docker-ce-edge'
-    option: enabled
-    value: 0
-  become: yes
-
-- name: Enable Docker Test repo
-  ini_file:
-    dest: /etc/yum.repos.d/docer-ce.repo
-    section: 'docker-ce-test'
-    option: enabled
-    value: 0
-  become: yes
-
-- name: Install Docker
-  package:
-    name: "{{ docker_package }}"
-    state: present
-  become: yes
-
-- name: Start Docker service
-  service:
-    name: docker
-    state: started
-    enabled: yes
-  become: yes
-
-#Remove os docker-compose if installed
-- name:
-  yum:
-    name: docker-compose 
-    state: absent
-
-#Check if docker-compose i still available
-#Not really so failsafe since we can't find the path
-- name: Check current docker-compose version.
-  command: docker-compose --version
-  register: docker_compose_current_version
-  changed_when: false
-  failed_when: false
-
-- name: Delete existing docker-compose version if it's different.
-  file:
-    path: "{{ docker_compose_path }}"
-    state: absent
-  when: >
-    docker_compose_current_version.stdout is defined
-    and docker_compose_version not in docker_compose_current_version.stdout
-
-- name: Install Docker Compose (if configured).
-  get_url:
-    url: https://github.com/docker/compose/releases/download/{{ docker_compose_version }}/docker-compose-Linux-x86_64
-    dest: "{{ docker_compose_path }}"
-    mode: 0755
-
-- name: Ensure docker users are added to the docker group.
-  user:
-    name: "{{ item }}"
-    groups: [docker]
-    append: true
-  with_items: "{{ docker_users }}"
-  when: docker_users | length > 0
-
-- name: Install python docker so ansible can use it
-  pip:
-    name: docker
-    executable: /usr/bin/pip3
 
 
-- name: Add users to docker
-  user:
-    name: "{{ item }}"
-    groups: docker
-    append: yes
-  with_items: 
-    "{{ docker_users }}" 
- 
+
+

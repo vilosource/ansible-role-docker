@@ -1,5 +1,2 @@
 ---
-docker_package: docker-ce
-docker_compose_path: /bin/docker-compose
-docker_compose_version: 1.25.4
   
