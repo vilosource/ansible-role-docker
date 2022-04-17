@@ -1,7 +1,21 @@
 ---
 # defaults
 #
-docker_package: docker-ce
-docker_compose_path: /bin/docker-compose
-docker_compose_version: 1.25.4
-docker_users: 
+
+docker_users: ["abkctl"]
+harbor_version: "v2.0.2"
+
+unwanted_docker_packages:
+    - docker 
+    - docker-client 
+    - docker-client-latest 
+    - docker-common 
+    - docker-latest 
+    - docker-latest-logrotate 
+    - docker-logrotate 
+    - docker-engine
+
+docker_packages:
+    - docker-ce 
+    - docker-ce-cli 
+    - containerd.io

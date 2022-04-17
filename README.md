@@ -1,12 +1,21 @@
-Docker
+# Docker
 This role installs and configures a docker server.
 
-Requirements
-Tested only on AWS AMI and Centos 7
+## Requirements
+Tested on centos 7, centos 8 and RockyLinux 8.4
 
-Role Variables
+## Role Variables
 
-Example Playbook
-- hosts: docker
+## Example Playbook
+
+The following sample playbook will install docker on the target host and also ensure that ansible is added to the docker user group. 
+docker-compose will also be installed. 
+
+```
+- hosts: harbor.lab.abakuscloud.com
+  become: true
+  remote_user: ansible
+  gather_facts: no
   roles:
-     - docker
+    - docker
+```

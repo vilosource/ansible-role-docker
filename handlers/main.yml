@@ -1,13 +1,12 @@
 ---
 # handlers file for jnvilo.docker
 
-- name: start_docker
+- name: restart docker
   service:
-    name: docker
-    state: started
-
-- name: stop_docker
-  service: 
     name: docker 
-    state: stopped
-  
+    state: restarted
+
+- name: reload firewalld
+  service: 
+    name: firewalld
+    state: reloaded

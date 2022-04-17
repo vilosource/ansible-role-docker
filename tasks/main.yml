@@ -1,16 +1,52 @@
 ---
-- debug:
-    msg: "OS Version - {{ ansible_distribution}}"
+- name: Remove default docker packages
+  ansible.builtin.package:
+    name:  "{{item}}"
+    state: absent
+  with_items: "{{unwanted_docker_packages}}"
+  tags:
+    - package_cleanup
 
-- name: Install docker
-  include: "{{ item }}"
-  with_first_found:
-    - "{{ ansible_distribution }}-{{ ansible_distribution_major_version}}.yml"
-    - "{{ ansible_distribution }}.yml"
-  tags: vars
+- name: Install yum-utils
+  ansible.builtin.package:
+    name: yum-utils
+    state: present
 
 
+- name: Docker Repo
+  get_url:
+    url: https://download.docker.com/linux/centos/docker-ce.repo
+    dest: /etc/yum.repos.d/docker-ce.repo
 
+
+- name: Install docker packages
+  ansible.builtin.package:
+    name: "{{item}}"
+    state: present
+  with_items: "{{docker_packages}}"
+  tags:
+    - docker_packages
+
+
+- name: Ensure docker is running 
+  ansible.builtin.service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: make sure ansible can run docker
+  ansible.builtin.user:
+    name: ansible
+    groups: docker
+    append: yes  
+
+- name: install docker-compose
+  get_url: 
+    url: "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-Linux-x86_64"
+    dest: /usr/bin/docker-compose
+    mode: '0755'
+  tags: 
+    - docker-compose
 
 
 
