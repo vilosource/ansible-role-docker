@@ -12,7 +12,7 @@ The following sample playbook will install docker on the target host and also en
 docker-compose will also be installed. 
 
 ```
-- hosts: harbor.lab.abakuscloud.com
+- hosts: harbor.lab.jnvilo.com
   become: true
   remote_user: ansible
   gather_facts: no
