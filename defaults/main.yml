@@ -2,7 +2,7 @@
 # defaults
 #
 
-docker_users: ["abkctl"]
+docker_users: ["ansible"]
 harbor_version: "v2.0.2"
 
 unwanted_docker_packages:
@@ -19,3 +19,6 @@ docker_packages:
     - docker-ce 
     - docker-ce-cli 
     - containerd.io
+
+
+docker_compose_version: "2.6.0-3"

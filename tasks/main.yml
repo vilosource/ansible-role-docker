@@ -6,18 +6,35 @@
   with_items: "{{unwanted_docker_packages}}"
   tags:
     - package_cleanup
+    - docker_packages
+    - docker
 
 - name: Install yum-utils
   ansible.builtin.package:
     name: yum-utils
     state: present
+  tags:
+    - docker_packages
+    - docker
 
 
-- name: Docker Repo
-  get_url:
-    url: https://download.docker.com/linux/centos/docker-ce.repo
-    dest: /etc/yum.repos.d/docker-ce.repo
+#- name: Docker Repo
+#  get_url:
+#    url: https://download.docker.com/linux/centos/docker-ce.repo
+#    dest: /etc/yum.repos.d/docker-ce.repo
 
+- name: Add Docker CE repository
+  become: true
+  ansible.builtin.yum_repository:
+    name: docker-ce
+    description: Docker CE Stable - $basearch
+    baseurl: https://download.docker.com/linux/centos/8/$basearch/stable
+    enabled: true
+    gpgcheck: true
+    gpgkey: https://download.docker.com/linux/centos/gpg
+  tags:
+    - docker_packages
+    - docker
 
 - name: Install docker packages
   ansible.builtin.package:
@@ -26,6 +43,7 @@
   with_items: "{{docker_packages}}"
   tags:
     - docker_packages
+    - docker
 
 
 - name: Ensure docker is running 
@@ -33,20 +51,36 @@
     name: docker
     state: started
     enabled: yes
+  tags:
+    - docker_service
+    - docker
 
 - name: make sure ansible can run docker
   ansible.builtin.user:
-    name: ansible
+    name: "{{item}}"
     groups: docker
-    append: yes  
+    append: yes
+  with_items: "{{docker_users}}"
+  tags:
+    - docker_service
+    - docker
 
-- name: install docker-compose
-  get_url: 
-    url: "https://github.com/docker/compose/releases/download/1.28.2/docker-compose-Linux-x86_64"
-    dest: /usr/bin/docker-compose
-    mode: '0755'
-  tags: 
-    - docker-compose
+- name: Install docker-compose-plugin as defined in defaults
+  ansible.builtin.package:
+    name: docker-compose-plugin-{{docker_compose_version}}.x86_64
+    state: present
+  tags:
+    - docker_compose
+    - docker
 
-
+- name: Add alias to bashrc file
+  lineinfile:
+    path: /etc/bashrc
+    line: "alias docker-compose='docker compose '"
+    state: present
+    insertafter: EOF
+  tags:
+    - docker_compose_alias
+    - docker_compose
+    - docker
 
